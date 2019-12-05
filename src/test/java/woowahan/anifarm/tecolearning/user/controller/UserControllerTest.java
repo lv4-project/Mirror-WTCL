@@ -40,7 +40,7 @@ public class UserControllerTest extends AbstractWebTestClient {
     void createUser() {
         Map<String, String> params = new HashMap<>();
         params.put(EMAIL, "test@email.com");
-        params.put(PASSWORD, "test");
+        params.put(PASSWORD, "testtest");
         params.put(NICK_NAME, "test");
 
         assertThat(postJsonRequest(API_USERS + "/signup", params).getStatus().is2xxSuccessful()).isTrue();
@@ -50,6 +50,7 @@ public class UserControllerTest extends AbstractWebTestClient {
     @DisplayName("존재하는 유저의 id 에 대해 유저의 정보를 조회")
     void readUser() {
         UserInfoDto userInfo = getRequest(API_USERS + "/" + testUser.getId(), UserInfoDto.class);
+        assertThat(getRequest(API_USERS + "/" + testUser.getId()).getStatus().is2xxSuccessful()).isTrue();
         assertThat(Objects.requireNonNull(userInfo).getId()).isEqualTo(testUser.getId());
         assertThat(Objects.requireNonNull(userInfo).getEmail()).isEqualTo(testUser.getEmail());
         assertThat(Objects.requireNonNull(userInfo).getNickName()).isEqualTo(testUser.getNickName());

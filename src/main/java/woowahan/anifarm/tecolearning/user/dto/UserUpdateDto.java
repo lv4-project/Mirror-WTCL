@@ -9,10 +9,12 @@ import woowahan.anifarm.tecolearning.user.domain.User;
 @Getter
 public class UserUpdateDto {
     private String nickName;
+    private String introduction;
 
     @Builder
-    public UserUpdateDto(String nickName) {
+    public UserUpdateDto(String nickName, String introduction) {
         this.nickName = nickName;
+        this.introduction = introduction;
     }
 
     public User toEntity() {

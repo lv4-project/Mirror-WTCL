@@ -17,29 +17,34 @@ public class User {
     @Column(name = "user_id", nullable = false)
     private Long id;
 
-    @Column(name = "email", length = 50, unique = true)
+    @Column(name = "email", length = 60, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false, length = 10)
+    @Column(name = "password", nullable = false, length = 30)
     private String password;
 
-    @Column(name = "nick_name", nullable = false)
+    @Column(name = "nick_name", nullable = false, length = 10)
     private String nickName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private AccountStatus status = AccountStatus.ACTIVE;
 
+    @Column(name = "introduction", nullable = false, length = 300)
+    private String introduction;
+
     @Builder
-    public User(Long id, String email, String password, String nickName) {
+    public User(Long id, String email, String password, String nickName, String introduction) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.nickName = nickName;
+        this.introduction = introduction;
     }
 
     public void update(User updateUser) {
         this.nickName = updateUser.nickName;
+        this.introduction = updateUser.introduction;
     }
 
     public void deactivate() {

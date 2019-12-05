@@ -1,9 +1,13 @@
 package woowahan.anifarm.tecolearning.user.controller;
 
+import com.github.springtestdbunit.annotation.DatabaseOperation;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.github.springtestdbunit.annotation.DatabaseTearDown;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import woowahan.anifarm.tecolearning.AbstractWebTestClient;
-import woowahan.anifarm.tecolearning.user.domain.User;
 import woowahan.anifarm.tecolearning.user.dto.UserInfoDto;
 
 import java.util.HashMap;
@@ -16,15 +20,23 @@ public class UserControllerTest extends AbstractWebTestClient {
     private static final String EMAIL = "email";
     private static final String PASSWORD = "password";
     private static final String NICK_NAME = "nickName";
-    private static final String STATUS = "status";
+
     private static final String API_USERS = "/api/users";
 
-    private static final User TEST_USER = User.builder()
-            .id(1L)
-            .email("learner_duck@woowahan.com")
-            .password("master")
-            .nickName("learner duck")
-            .build();
+    private UserInfoDto testUser;
+
+    @Override
+    @BeforeEach
+    protected void setUp() {
+        super.setUp();
+        testUser = getRequest(API_USERS + "/" + 1, UserInfoDto.class);
+    }
+
+    @Override
+    @AfterEach
+    protected void tearDown() {
+        super.tearDown();
+    }
 
     @Test
     @DisplayName("적절한 입력 시 회원가입 성공")
@@ -40,10 +52,10 @@ public class UserControllerTest extends AbstractWebTestClient {
     @Test
     @DisplayName("존재하는 유저의 id 에 대해 유저의 정보를 조회")
     void readUser() {
-        UserInfoDto userInfo = getRequest(API_USERS + "/" + TEST_USER.getId(), UserInfoDto.class);
-        assertThat(Objects.requireNonNull(userInfo).getId()).isEqualTo(TEST_USER.getId());
-        assertThat(Objects.requireNonNull(userInfo).getEmail()).isEqualTo(TEST_USER.getEmail());
-        assertThat(Objects.requireNonNull(userInfo).getNickName()).isEqualTo(TEST_USER.getNickName());
+        UserInfoDto userInfo = getRequest(API_USERS + "/" + testUser.getId(), UserInfoDto.class);
+        assertThat(Objects.requireNonNull(userInfo).getId()).isEqualTo(testUser.getId());
+        assertThat(Objects.requireNonNull(userInfo).getEmail()).isEqualTo(testUser.getEmail());
+        assertThat(Objects.requireNonNull(userInfo).getNickName()).isEqualTo(testUser.getNickName());
     }
 
     @Test
@@ -53,7 +65,7 @@ public class UserControllerTest extends AbstractWebTestClient {
         params.put(NICK_NAME, "moo");
 
         assertThat(putJsonRequest(API_USERS, params).getStatus().is2xxSuccessful()).isTrue();
-        assertThat(getRequest(API_USERS + "/" + TEST_USER.getId(), UserInfoDto.class).getNickName()).isEqualTo("moo");
+        assertThat(getRequest(API_USERS + "/" + testUser.getId(), UserInfoDto.class).getNickName()).isEqualTo("moo");
     }
 
     @Test

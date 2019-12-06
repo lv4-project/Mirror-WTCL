@@ -7,12 +7,7 @@ import lombok.NoArgsConstructor;
 import woowahan.anifarm.tecolearning.user.exception.UserCreateException;
 
 import javax.persistence.*;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import javax.validation.constraints.Pattern;
-import javax.validation.executable.ExecutableValidator;
-import java.util.Set;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -23,7 +18,7 @@ public class User {
     private static final String NICK_NAME_PATTERN = "[a-zA-Z0-9가-힣]{2,20}";
 
     private static final String EMAIL_ERROR_MESSAGE = "이메일 형식에 맞지 않습니다.";
-    private static final String PASSWORD_ERROR_MESSAGE= "비밀번호는 8 ~ 30자";
+    private static final String PASSWORD_ERROR_MESSAGE = "비밀번호는 8 ~ 30자";
     private static final String NICK_NAME_ERROR_MESSAGE = "닉네임은 2 ~ 20자 한글 숫자 영어";
 
     @Id
@@ -51,12 +46,10 @@ public class User {
     private String introduction;
 
     @Builder
-    public User(Long id,
-                @Pattern(regexp = EMAIL_PATTERN, message = EMAIL_ERROR_MESSAGE) String email,
-                @Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_ERROR_MESSAGE) String password,
-                @Pattern(regexp = NICK_NAME_PATTERN, message = NICK_NAME_ERROR_MESSAGE) String nickName,
-                String introduction) {
-        validate(id, email, password, nickName, introduction);
+    public User(Long id, String email, String password, String nickName, String introduction) {
+        validateEmail(email);
+        validatePassword(password);
+        validateNicName(nickName);
 
         this.id = id;
         this.email = email;
@@ -65,28 +58,21 @@ public class User {
         this.introduction = introduction;
     }
 
-    private void validate(Long id, String email, String password, String nickName, String introduction) {
-        Set<ConstraintViolation<User>> constraintViolations = getConstraintViolations(id, email, password, nickName, introduction);
-
-        if (constraintViolations.size() > 0) {
-            constraintViolations.forEach(violation -> {
-                        throw new UserCreateException(violation.getMessage());
-                    }
-            );
+    private void validateEmail(String email) {
+        if (java.util.regex.Pattern.matches(EMAIL_PATTERN, email)) {
+            throw new UserCreateException(EMAIL_ERROR_MESSAGE);
         }
     }
 
-    private Set<ConstraintViolation<User>> getConstraintViolations(Long id, String email, String password, String nickName, String introduction) {
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        ExecutableValidator executableValidator = validator.forExecutables();
+    private void validatePassword(String password) {
+        if (java.util.regex.Pattern.matches(PASSWORD_PATTERN, password)) {
+            throw new UserCreateException(PASSWORD_ERROR_MESSAGE);
+        }
+    }
 
-        try {
-            return executableValidator.validateConstructorParameters(
-                    User.class.getConstructor(Long.class, String.class, String.class, String.class, String.class),
-                    new Object[]{id, email, password, nickName, introduction}
-            );
-        } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException();
+    private void validateNicName(String nickName) {
+        if (java.util.regex.Pattern.matches(NICK_NAME_PATTERN, nickName)) {
+            throw new UserCreateException(NICK_NAME_ERROR_MESSAGE);
         }
     }
 
